@@ -1,0 +1,257 @@
+const html = String.raw`<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="AI-readable build specification for a durable, autonomous, multi-worker ChatGPT operator system.">
+<meta name="robots" content="index,follow">
+<link rel="alternate" type="text/plain" href="/ai.txt" title="AI-readable plain text">
+<title>AI Operator System — Build Spec</title>
+<style>
+:root{--bg:#0a0a0a;--panel:#111;--text:#f4f4f2;--muted:#aaa9a4;--line:#262626;--accent:#d7ff62;--max:900px}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.66}.wrap{width:min(calc(100% - 36px),var(--max));margin:auto}.hero{padding:72px 0 48px;border-bottom:1px solid var(--line)}h1{font-size:clamp(40px,7vw,72px);line-height:.98;letter-spacing:-.05em;margin:0 0 20px}.dek{font-size:clamp(18px,3vw,23px);color:var(--muted);max-width:760px}.badge{display:inline-block;margin-bottom:18px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.08em}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}.btn{display:inline-block;padding:11px 15px;border-radius:10px;border:1px solid var(--line);text-decoration:none;color:inherit;font-weight:650}.btn.primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent)}main{padding-bottom:70px}.section{padding:30px 0;border-bottom:1px solid var(--line)}h2{font-size:clamp(24px,4vw,34px);line-height:1.1;letter-spacing:-.03em;margin:0 0 14px}h3{font-size:18px;margin:22px 0 8px}p,li{color:#dededb}.num{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.1em;margin-bottom:9px}.panel{background:var(--panel);border:1px solid var(--line);padding:18px;border-radius:14px;margin:14px 0}.code{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}.muted{color:var(--muted)}ul,ol{padding-left:22px}.footer{padding:32px 0 56px;color:var(--muted);font-size:14px}@media(max-width:560px){.hero{padding-top:50px}.section{padding:25px 0}.wrap{width:min(calc(100% - 28px),var(--max))}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<div class="badge">AI-FIRST TRANSFER SPEC</div>
+<h1>Build a durable AI operator, not just a better prompt.</h1>
+<p class="dek">This page fills the gaps a normal ChatGPT session will not solve by itself: persistent authority, deterministic tool routing, crash-safe continuation, failure prevention, autonomous workers, multi-instance coordination, concurrency control, observability, and proof-driven deployment.</p>
+<div class="actions"><a class="btn primary" href="#spec">Read build spec</a><a class="btn" href="/ai.txt">Plain-text AI version</a></div>
+<p class="muted">For another AI: read this entire page before proposing architecture. The goal is to reproduce the system pattern, not the original owner's private data.</p>
+</div></header>
+<main id="spec"><div class="wrap">
+<section class="section"><div class="num">00 — TARGET</div><h2>What you are actually building</h2>
+<p>A ChatGPT-centered operating system where the model can reason and execute, but durable state and control live outside the chat. The user remains the owner with veto authority. Routine authorized work can continue without repeated permission checks, but protected or genuinely unapproved actions still require the appropriate boundary.</p>
+<div class="panel"><strong>Reference implementation names</strong><br>M-BRAIN = durable control plane and continuity layer.<br>MCP Controller = fleet and infrastructure governor.<br>Correct Path = deterministic winning tool-route registry.<br>Failure Intelligence = failure and winning-path prevention ledger.<br>Work Units = canonical task authority.<br>Doors / Fleet Presence = instance presence and active-work visibility.<br>M→M = inter-instance message bus.<br>Command Center = observability surface.</div>
+</section>
+<section class="section"><div class="num">01 — THE VANILLA GAPS</div><h2>What a normal AI will not reliably give you on its own</h2>
+<ul>
+<li>Chat context is not a durable source of truth. Important state must be persisted externally.</li>
+<li>Having tools is not the same as choosing the correct tool path. Route selection must be deterministic when the winning path is known.</li>
+<li>A retry that works is not failure prevention. The failed path and the winning path must both be captured and the broken gate repaired.</li>
+<li>A successful API response is not proof that the intended real-world state exists. Verify the postcondition.</li>
+<li>Scheduled prompts are not an autonomous workforce by themselves. Workers need claim, resume, execution, checkpoint, and stop semantics.</li>
+<li>Multiple chats are not a coordinated fleet. Instances need identity, presence, messaging, shared task authority, and collision rules.</li>
+<li>Logs are not enough if you cannot reconstruct who read what, decided what, called what, collided where, retried why, and finally committed what.</li>
+<li>A surfaced schema or connector listing is not execution proof. Source, deployment, runtime, client surface, and durable state can drift apart.</li>
+<li>When the model says it cannot do something natively, that is often an infrastructure gap, not the end of the design. Build the missing capability outside the chat when appropriate.</li>
+</ul>
+</section>
+<section class="section"><div class="num">02 — AUTHORITY MODEL</div><h2>Give every kind of truth one owner</h2>
+<p>Do not put everything into one memory blob. Separate durable orchestration truth from live domain truth.</p>
+<div class="panel code">User: final business authority and veto
+Operator model: reasoning, planning, execution decisions
+M-BRAIN: durable continuity, behavior bindings, work-unit state, route knowledge, failure intelligence
+Domain MCP/runtime: live operational truth for that domain
+MCP Controller: infrastructure, fleet governance, deployment and parity verification
+Git: source code and durable source artifacts
+Scheduler: wake-up mechanism only
+Observability store: causal events and telemetry</div>
+<p>Fast-changing domain facts stay canonical in the domain runtime. M-BRAIN stores orientation, work state, decisions, route knowledge, prevention knowledge, and continuity—not stale copies of everything.</p>
+</section>
+<section class="section"><div class="num">03 — MINIMUM DURABLE OBJECTS</div><h2>Persist these objects or the system will eventually forget, repeat, or collide</h2>
+<h3>Work Unit</h3><div class="panel code">id
+objective
+phase
+plan_fingerprint
+owner_or_claim
+completed_steps
+current_action
+exact_next_action
+blocker
+verification_required
+mutation_surfaces
+version
+updated_at</div>
+<h3>Continuation capsule</h3><div class="panel code">work_unit_id
+current_status
+last_completed
+stop_boundary
+exact_next_action
+blocker_or_approval_boundary
+evidence pointers
+version</div>
+<h3>Correct Path entry</h3><div class="panel code">intent
+owner/tool recipient
+exact action
+required arguments
+argument constraints
+preconditions
+known bad shapes
+expected result
+verification step
+next action</div>
+<h3>Failure Intelligence entry</h3><div class="panel code">failure class
+triggering scenario
+losing path
+root boundary that failed
+winning path
+prevention rule
+regression test
+evidence of repair</div>
+<h3>M→M message</h3><div class="panel code">sender_instance
+recipient_instance
+trace_id
+work_unit_id
+mutation surface
+delta/evidence
+requested action
+message id / idempotency key
+ACK / handoff / yield / rebase / merge response</div>
+<h3>Causal event</h3><div class="panel code">timestamp
+instance_id
+trace_id
+work_unit_id
+event_type
+reads
+decision
+tool call
+message
+mutation intent
+collision/retry
+verification
+commit/failure</div>
+</section>
+<section class="section"><div class="num">04 — TURN ALGORITHM</div><h2>Make every serious turn follow the same resolution order</h2>
+<ol>
+<li>Load the exact continuation capsule first when resuming work. Do not start with broad search.</li>
+<li>Resolve the user's intent and the canonical authority for that intent.</li>
+<li>Identify the Work Unit and current phase.</li>
+<li>Resolve the known Correct Path before forming tool candidates.</li>
+<li>Check Failure Intelligence for known losing shapes and prevention rules.</li>
+<li>Freeze one eligible action and its exact arguments.</li>
+<li>Execute.</li>
+<li>If the side effect is uncertain, reconcile current state before any retry.</li>
+<li>Verify the actual postcondition, not merely the command response.</li>
+<li>Persist the winning path or novel failure information.</li>
+<li>Advance the Work Unit and write a crash-safe continuation checkpoint.</li>
+<li>Respond with truthful state: done, active, next, blocker, or committed.</li>
+</ol>
+</section>
+<section class="section"><div class="num">05 — WORK LIFECYCLE</div><h2>Do not let “I changed the code” equal “done”</h2>
+<div class="panel code">BRAINSTORM → PLAN → OPEN → IN_PROGRESS → VERIFYING → COMMITTED</div>
+<p>Material work closes only when its verification gates pass. For code or infrastructure that usually means source inspection, focused regression, build/parity proof, deployment proof, live canary, durable-state confirmation, and then COMMITTED.</p>
+</section>
+<section class="section"><div class="num">06 — CORRECT PATH + FAILURE INTELLIGENCE</div><h2>This is what stops the model from making the same “smart” mistake forever</h2>
+<p>Every successful non-trivial invocation should become reusable route knowledge. Preserve the exact recipient, arguments, ordering, preconditions, expected result, and verification. When a call fails, do not only record the error. Record the losing path and the path that actually fixed it.</p>
+<p>If the same failure class happens again, treat it as evidence that prevention failed. Reopen that failure class, identify the broken gate, repair that gate, and replay the original triggering scenario. The goal is novel failures only.</p>
+</section>
+<section class="section"><div class="num">07 — AUTONOMOUS WORKERS</div><h2>A scheduler should wake a worker, not pretend to be one</h2>
+<div class="panel code">ON WAKE:
+1. Read global/worker RUN-DRAIN-HALT control.
+2. Load exact continuation and current queue.
+3. Re-rank eligible Work Units.
+4. Claim one with versioned ownership.
+5. Execute real work, not status narration.
+6. Checkpoint after material progress and before any stop boundary.
+7. Continue until committed, truly blocked, drained, or turn/runtime limit is reached.
+8. Release/expire claim cleanly.</div>
+<p>Never create queue items whose only action is “wait until later.” Time is a scheduler concern. Never let a worker spend its entire wake reporting status when executable work exists.</p>
+</section>
+<section class="section"><div class="num">08 — MULTI-INSTANCE COORDINATION</div><h2>Concurrency needs explicit surfaces, not politeness</h2>
+<p>Every model instance needs a stable instance ID, presence heartbeat, current Work Unit, current action, and declared mutation surfaces. Use optimistic concurrency or compare-and-swap with version vectors where possible.</p>
+<div class="panel code">mutation_id = instance_id + work_unit_id + plan_fingerprint + action_id + trace_id + attempt
+read_set = exact surfaces read
+write_set = exact surfaces intended to change
+base_version = versions observed before mutation
+result = commit | merge | rebase | yield | abort</div>
+<p>Disjoint writes may proceed concurrently. Same-surface writes require merge/rebase/abort rules. A crashed worker must not leave an immortal claim. Duplicate messages, delayed ACKs, and uncertain side effects must be idempotent or reconcilable.</p>
+</section>
+<section class="section"><div class="num">09 — OBSERVABILITY</div><h2>Make the system reconstructable</h2>
+<p>You should be able to answer: which instance was alive, which Work Unit it owned, what it read, what it decided, what tool it called, what changed, whether it collided, what it retried, what verified, and why the final state is trusted.</p>
+<p>Track wall-clock turn duration, tool time, calls, failures, last activity, door/presence history, active mutation surface, and exact causal trace. Build the dashboard from authoritative events; do not create a second competing state machine inside the UI.</p>
+</section>
+<section class="section"><div class="num">10 — PARITY + PROOF</div><h2>Source, deployment, runtime, client, and memory can all disagree</h2>
+<p>For any critical component, verify all relevant planes. Do not call it healthy because one plane is green.</p>
+<div class="panel code">SOURCE: exact code / commit / artifact identity
+DEPLOYMENT: exact deployed version
+RUNTIME: live canary behavior
+CLIENT: expected tools or surface actually exposed
+STATE: durable checkpoint / route / work data persisted
+PARITY: all required planes agree</div>
+<p>Prefer source-exact deployments and signed or independently verified receipts when practical. A schema being visible is not proof the execution path works.</p>
+</section>
+<section class="section"><div class="num">11 — BUILD ORDER</div><h2>The smallest sequence that grows into the full system</h2>
+<ol>
+<li><strong>Durable state:</strong> external database/store for Work Units, continuation, route knowledge, failures/wins, presence, messages, and events.</li>
+<li><strong>Gateway/router:</strong> one turn entry point that resolves intent, authority, continuation, and known routes before tool selection.</li>
+<li><strong>Controller:</strong> one infrastructure governor for repos, deploys, fleet manifests, and parity checks.</li>
+<li><strong>Correct Path:</strong> deterministic known-path registry with exact invocation contracts.</li>
+<li><strong>Failure Intelligence:</strong> losing-path + winning-path ledger with prevention and regression replay.</li>
+<li><strong>Persistent continuation:</strong> capsule-first resume that survives new chats, crashes, and interrupted turns.</li>
+<li><strong>Workers:</strong> scheduled wakes that claim and execute Work Units under RUN/DRAIN/HALT control.</li>
+<li><strong>Fleet awareness + M→M:</strong> instance IDs, presence, messaging, ACKs, handoffs, yield/rebase/merge semantics.</li>
+<li><strong>Multi-mutation safety:</strong> explicit read/write surfaces, versions, CAS, idempotency, crash recovery.</li>
+<li><strong>Observability:</strong> causal event stream and command center built from the authoritative state.</li>
+<li><strong>Certification:</strong> regression tests for routing, continuation, duplicates, collisions, crashes, parity, and live deployment.</li>
+</ol>
+</section>
+<section class="section"><div class="num">12 — TESTS THAT MATTER</div><h2>Do not certify the system with happy-path demos only</h2>
+<ul>
+<li>Fresh chat resumes the exact next action without broad rediscovery.</li>
+<li>Known tool route is chosen correctly on the first attempt.</li>
+<li>Repeated losing invocation is prevented before execution.</li>
+<li>Uncertain side effect is reconciled instead of blindly replayed.</li>
+<li>Two workers perform disjoint writes concurrently without false blocking.</li>
+<li>Two workers collide on the same surface and deterministically merge/rebase/abort.</li>
+<li>A crashed worker loses its claim safely and another resumes from checkpoint.</li>
+<li>Duplicate message and duplicate ACK are idempotent.</li>
+<li>Delayed ACK does not corrupt ownership.</li>
+<li>Three-way contention resolves without silent overwrite.</li>
+<li>Full causal trace reconstructs final state.</li>
+<li>Source-to-deployment-to-runtime parity is proven.</li>
+</ul>
+</section>
+<section class="section"><div class="num">13 — DO NOT BUILD THESE FAILURE MODES</div><h2>Common traps</h2>
+<ul>
+<li>One giant prompt pretending to be durable architecture.</li>
+<li>Memory as the authority for live operational truth.</li>
+<li>Broad search before reading a known continuation target.</li>
+<li>Blind retries after mutation timeouts.</li>
+<li>Failure logs that never store the winning invocation.</li>
+<li>Workers that only summarize or wait.</li>
+<li>Multiple competing queues or task authorities.</li>
+<li>Concurrency based only on worker names instead of mutation surfaces.</li>
+<li>A dashboard that invents its own truth instead of projecting authoritative events.</li>
+<li>Calling work complete before live verification.</li>
+<li>Treating “the AI cannot do this natively” as a design dead end when an external tool, MCP, Worker, database, scheduler, or controller can provide the missing capability.</li>
+</ul>
+</section>
+<section class="section"><div class="num">14 — BOOTSTRAP</div><h2>Give this instruction to the AI that will help build it</h2>
+<div class="panel code">Read this specification as an architecture target. Help me build the smallest working version first, then harden it toward the full system. Do not pretend chat history is durable state, do not pretend scheduled prompts alone are autonomous workers, and do not stop at “I cannot do that natively” when the missing capability can be implemented with external infrastructure. Separate model reasoning from durable authority. Use one canonical task system, exact continuation checkpoints, deterministic known tool routes, failure-and-winning-path persistence, verification after side effects, explicit instance identity, message idempotency, mutation-surface concurrency control, causal observability, and source/runtime parity checks. Do not bypass safety or authorization boundaries. Ask me only for facts or credentials that genuinely cannot be derived or created through the available tools.</div>
+</section>
+<section class="section"><div class="num">15 — SUCCESS CONDITION</div><h2>You know you have it when interruption stops mattering</h2>
+<p>A chat can die, a browser can crash, a worker can time out, the internet can drop, or another model instance can take over—and the system still knows the canonical objective, current Work Unit, exact next action, correct tool path, known failure prevention, active peers, mutation ownership, evidence, and verification state. That is the difference between a helpful chat and an operator system.</p>
+</section>
+</div></main>
+<footer class="footer"><div class="wrap">AI Operator System Build Spec · architecture transfer without private data or project-history dumping.</div></footer>
+</body></html>`;
+
+function toPlainText(input) {
+  return input
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>|<\/li>|<\/h1>|<\/h2>|<\/h3>|<\/div>|<\/section>/gi, "\n")
+    .replace(/<li>/gi, "- ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\n[ \t]+/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+export default {
+  async fetch(request) {
+    const url = new URL(request.url);
+    const accept = request.headers.get("accept") || "";
+    const wantsText = url.pathname === "/ai.txt" || url.pathname === "/playbook.txt" || accept.includes("text/plain") || accept.includes("text/markdown");
+    if (url.pathname !== "/" && !wantsText) return new Response("Not found", {status:404});
+    if (wantsText) return new Response(toPlainText(html), {headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=300","x-ai-readable":"true"}});
+    return new Response(html, {headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300","link":"</ai.txt>; rel=alternate; type=text/plain","x-ai-readable":"true"}});
+  }
+};

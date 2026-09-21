@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Get Lensically Operator for Threads — a commercial AI Threads operator for planning, writing, scheduling, scoring, and improving your content.">
+  <title>Lensically Operator for Threads — Lensically</title>
+  <meta name="theme-color" content="#f2f2f0">
+  <style>
+    :root{--bg:#f2f2f0;--card:#fff;--ink:#050505;--muted:#686868;--line:rgba(5,5,5,.13);--silver:#8d8d8d}
+    *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.45}
+    a{color:inherit;text-decoration:none}
+    .page{width:min(660px,calc(100% - 36px));margin:0 auto;padding:28px 0 42px}
+    .back{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.82);color:#333;font-size:13px;font-weight:850;padding:9px 14px;cursor:pointer}
+    .back svg{width:18px;height:18px}.back path{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+    .hero{display:block;width:min(540px,100%);margin:8px auto 18px;padding:0;border:0;background:transparent;appearance:none;cursor:pointer}
+    .hero img{display:block;width:100%;height:auto;max-height:520px;object-fit:contain;margin:0 auto;animation:float 4s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    .section{margin:8px 0 0;padding:18px 0}
+    .section h1{margin:0 0 8px;text-align:center;font-size:26px;line-height:1.08;letter-spacing:-.035em}
+    .sub{margin:0 auto 19px;max-width:520px;color:var(--muted);font-size:14px;text-align:center}
+    .summary{text-align:center;margin:0 0 18px}.name{margin:0 0 8px;color:#666;font-size:14px;font-weight:750}.price{margin:0;color:#111;font-size:36px;line-height:1;font-weight:800;letter-spacing:-.04em}.price-note{margin:8px 0 0;color:#666;font-size:13px;font-weight:700}
+    .panel{margin-top:18px;padding:22px;border:1px solid rgba(5,5,5,.09);border-radius:20px;background:#fff;box-shadow:0 14px 35px rgba(0,0,0,.06)}
+    .panel-title{margin:0 0 14px;font-size:15px;font-weight:900;text-align:center}
+    .checkout-shell{width:100%;min-height:240px;overflow:hidden}.embedded{width:100%}.loading{padding:28px 0;color:#777;font-size:13px;text-align:center}.error{display:none;margin-top:14px;padding:14px;border:1px solid #ddd;border-radius:10px;background:#fafafa;color:#555;font-size:13px;line-height:1.5}.error.show{display:block}
+    .policy{margin:16px auto 0;padding:14px 16px;border-radius:12px;background:#ededed;color:#333;font-size:12px;line-height:1.48}
+    .policy strong{display:block;margin-bottom:3px}
+    .footer{text-align:center;margin-top:30px;color:#555;font-size:11px;font-weight:700}.footer a{text-decoration:underline;text-underline-offset:2px}
+    @media(max-width:560px){.page{width:min(100% - 28px,660px);padding-top:23px}.hero{width:100%;margin-top:8px}.panel{padding:18px}.section h1{font-size:23px}}
+  </style>
+</head>
+<body>
+<main class="page">
+  <button class="back" type="button" id="back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 12H6.5M11.5 6.5 6 12l5.5 5.5"/></svg><span>Back</span></button>
+
+  <button class="hero" id="hero" type="button" aria-label="Go to checkout">
+    <img src="/lensically-operator-box.png" alt="Lensically Operator for Threads product box">
+  </button>
+
+  <section class="section" id="checkout">
+    <h1>Lensically Operator for Threads</h1>
+    <p class="sub">AI Threads operator for planning, writing, scheduling, scoring, and improving your content.</p>
+    <div class="summary">
+      <p class="name">Commercial License</p>
+      <p class="price">$97</p>
+      <p class="price-note">One-time purchase</p>
+    </div>
+
+    <div class="panel">
+      <p class="panel-title">Payment Details</p>
+      <div class="checkout-shell">
+        <div class="embedded" id="embedded-checkout">
+          <div class="loading" id="loading">Loading secure payment form…</div>
+        </div>
+      </div>
+      <div class="error" id="error">The secure payment form could not load. Refresh and try again.</div>
+      <div class="policy"><strong>Digital product purchase</strong>After payment, Lensically verifies the order and routes you into its secure licensed delivery flow. Digital-product purchases are non-refundable except where required by law.</div>
+    </div>
+  </section>
+
+  <div class="footer">© 2026 Lensically · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></div>
+</main>
+
+<script>
+(()=>{
+  const API='https://lensically-v2-mcp.lensically.workers.dev/api/commercial/embedded-checkout-session';
+  const back=document.getElementById('back');
+  const hero=document.getElementById('hero');
+  const loading=document.getElementById('loading');
+  const error=document.getElementById('error');
+  let stripePromise=null,checkout=null,starting=false;
+
+  back.addEventListener('click',()=>{if(history.length>1)history.back();else location.href='/'});
+  hero.addEventListener('click',()=>document.getElementById('checkout').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}));
+
+  const loadStripe=()=>{
+    if(typeof window.Stripe==='function')return Promise.resolve();
+    if(stripePromise)return stripePromise;
+    stripePromise=new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://js.stripe.com/clover/stripe.js';
+      s.onload=resolve;s.onerror=()=>reject(new Error('stripe_js_unavailable'));
+      document.head.appendChild(s);
+    });
+    return stripePromise;
+  };
+
+  const start=async()=>{
+    if(checkout||starting)return;
+    starting=true;
+    try{
+      await loadStripe();
+      const response=await fetch(API,{method:'POST',headers:{accept:'application/json'},credentials:'omit',cache:'no-store'});
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok||data.ok!==true||!data.publishable_key||!data.client_secret)throw new Error(data.error||'embedded_checkout_unavailable');
+      const stripe=window.Stripe(data.publishable_key);
+      checkout=await stripe.initEmbeddedCheckout({fetchClientSecret:async()=>data.client_secret});
+      if(loading)loading.remove();
+      checkout.mount('#embedded-checkout');
+    }catch(e){
+      console.error(e);
+      if(loading)loading.style.display='none';
+      error.classList.add('show');
+    }finally{starting=false}
+  };
+  start();
+})();
+</script>
+</body>
+</html>

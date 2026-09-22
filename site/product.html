@@ -1,77 +1,180 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="lo-product-root">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Get Lensically Operator for Threads — a commercial AI Threads operator for planning, writing, scheduling, scoring, and improving your content.">
   <title>Lensically Operator for Threads — Lensically</title>
   <meta name="theme-color" content="#f2f2f0">
+  <meta name="color-scheme" content="light only">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#f2f2f0;--card:#fff;--ink:#050505;--muted:#686868;--line:rgba(5,5,5,.13);--silver:#8d8d8d}
-    *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.45}
-    a{color:inherit;text-decoration:none}
-    .page{width:min(660px,calc(100% - 36px));margin:0 auto;padding:28px 0 42px}
-    .back{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.82);color:#333;font-size:13px;font-weight:850;padding:9px 14px;cursor:pointer}
+    :root{--bg:#f2f2f0;--ink:#050505;--muted:#686868;--line:rgba(5,5,5,.13)}
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Jost","Century Gothic",Arial,sans-serif!important;font-style:normal!important;line-height:1.45}
+    html{height:100%;overflow:hidden;overscroll-behavior:none}
+    body{position:fixed;inset:0;width:100%;height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+    body::before{content:"";position:fixed;inset:-100vh 0;z-index:-1;pointer-events:none;background:var(--bg)}
+    a{color:inherit;text-decoration:none}button,input{font-family:inherit;font-style:normal}
+    .page{width:min(660px,calc(100% - 36px));height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;margin:0 auto;padding:0;overflow:hidden}
+    .deck{height:200vh;height:200dvh;transform:translate3d(0,0,0);transition:transform .64s cubic-bezier(.22,.72,.18,1);will-change:transform}
+    .deck.scene-2{transform:translate3d(0,-100vh,0);transform:translate3d(0,-100dvh,0)}
+    .scene{width:100%;height:100vh;height:100dvh;min-height:100vh;min-height:100dvh;max-height:100vh;max-height:100dvh;overflow:hidden}
+    .product-scene{position:relative;display:flex;align-items:center;justify-content:center}
+    .page-nav{position:absolute;top:28px;left:0;z-index:5}
+    .back{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(11,11,11,.14);border-radius:999px;background:#fff;color:#111;font-size:13px;font-weight:500;padding:9px 14px;cursor:pointer;transition:transform .2s cubic-bezier(.2,.75,.25,1),background-color .2s ease,color .2s ease,border-color .2s ease}
     .back svg{width:18px;height:18px}.back path{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-    .hero{display:block;width:min(540px,100%);margin:8px auto 18px;padding:0;border:0;background:transparent;appearance:none;cursor:pointer}
-    .hero img{display:block;width:100%;height:auto;max-height:520px;object-fit:contain;margin:0 auto;animation:float 4s ease-in-out infinite}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-    .section{margin:8px 0 0;padding:18px 0}
-    .section h1{margin:0 0 8px;text-align:center;font-size:26px;line-height:1.08;letter-spacing:-.035em}
-    .sub{margin:0 auto 19px;max-width:520px;color:var(--muted);font-size:14px;text-align:center}
-    .summary{text-align:center;margin:0 0 18px}.name{margin:0 0 8px;color:#666;font-size:14px;font-weight:750}.price{margin:0;color:#111;font-size:36px;line-height:1;font-weight:800;letter-spacing:-.04em}.price-note{margin:8px 0 0;color:#666;font-size:13px;font-weight:700}
-    .panel{margin-top:18px;padding:22px;border:1px solid rgba(5,5,5,.09);border-radius:20px;background:#fff;box-shadow:0 14px 35px rgba(0,0,0,.06)}
-    .panel-title{margin:0 0 14px;font-size:15px;font-weight:900;text-align:center}
-    .checkout-shell{width:100%;min-height:240px;overflow:hidden}.embedded{width:100%}.loading{padding:28px 0;color:#777;font-size:13px;text-align:center}.error{display:none;margin-top:14px;padding:14px;border:1px solid #ddd;border-radius:10px;background:#fafafa;color:#555;font-size:13px;line-height:1.5}.error.show{display:block}
-    .policy{margin:16px auto 0;padding:14px 16px;border-radius:12px;background:#ededed;color:#333;font-size:12px;line-height:1.48}
-    .policy strong{display:block;margin-bottom:3px}
-    .footer{text-align:center;margin-top:30px;color:#555;font-size:11px;font-weight:700}.footer a{text-decoration:underline;text-underline-offset:2px}
-    @media(max-width:560px){.page{width:min(100% - 28px,660px);padding-top:23px}.hero{width:100%;margin-top:8px}.panel{padding:18px}.section h1{font-size:23px}}
+    .hero{position:relative;display:block;width:min(540px,100%);margin:0 auto;padding:0;border:0;background:transparent;appearance:none;-webkit-appearance:none;cursor:pointer}
+    .hero img{display:block;position:relative;z-index:1;width:auto;max-width:100%;height:auto;max-height:min(520px,calc(100vh - 160px));max-height:min(520px,calc(100dvh - 160px));object-fit:contain;margin:0 auto;animation:lo-product-float 4s ease-in-out infinite;will-change:transform;transition:filter .28s ease}
+    .hero::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(112deg,transparent 28%,rgba(255,255,255,.10) 39%,rgba(255,255,255,.90) 49%,rgba(255,255,255,.18) 57%,transparent 69%);background-size:260% 100%;background-position:145% 0;opacity:0;-webkit-mask:url('/lensically-operator-box.png') center/contain no-repeat;mask:url('/lensically-operator-box.png') center/contain no-repeat;animation:lo-product-float 4s ease-in-out infinite}
+    .hero.glimmer-now::after{animation:lo-product-float 4s ease-in-out infinite,lo-product-sheen 1.8s cubic-bezier(.2,.7,.25,1) 1}
+    .hero.shaking{animation:lo-product-shake .72s cubic-bezier(.34,.02,.2,1) 1;will-change:transform;transform-origin:40% 28%}
+    .hero.shaking img{animation:none!important}
+    .access-scene{position:relative;display:flex;align-items:center;justify-content:center}
+    .access-frame{width:100%;transform:scale(var(--lo-access-scale,1));transform-origin:center center;will-change:transform}
+    .checkout-section{margin:0;padding:0;text-align:center}
+    .checkout-section h1{margin:0 0 8px;font-size:26px;line-height:1.08;letter-spacing:-.025em;font-weight:600;text-wrap:balance}
+    .sub{margin:0 auto 18px;max-width:520px;color:var(--muted);font-size:14px;font-weight:400;text-align:center;text-wrap:balance}
+    .summary{margin:0 0 16px;text-align:center}
+    .license{margin:0 0 6px;color:#666;font-size:14px;font-weight:500}
+    .price{margin:0;color:#000;font-size:36px;line-height:1;font-weight:600;letter-spacing:-.04em}
+    .price-note{margin:8px 0 0;color:#666;font-size:13px;font-weight:500}
+    .payment-title{margin:0 0 12px;font-size:15px;font-weight:600;text-align:center}
+    .paid-panel{margin-top:0}
+    .checkout-shell{width:100%;max-width:none;min-height:220px;overflow:hidden;background:transparent;border:0;box-shadow:none}
+    .embedded{width:100%;max-width:none}
+    .embedded>*{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important}
+    .embedded div,.embedded iframe{width:100%!important;max-width:none!important}
+    .loading{padding:22px 0;color:#777;font-size:13px;text-align:center}
+    .error{display:none;margin-top:14px;padding:14px;border:1px solid #e0e0e0;border-radius:9px;background:#fafafa;color:#555;font-size:13px;line-height:1.5}.error.show{display:block}
+    .policy{margin:14px auto 0;padding:14px 16px;border-radius:7px;background:#ededed;color:#333;font-size:12px;line-height:1.48;text-align:left}
+    .policy strong{display:block;margin-bottom:3px;font-weight:600}
+    .footer{text-align:center;margin-top:24px;color:#555;font-size:11px;font-weight:400}.footer a{text-decoration:underline;text-underline-offset:2px}
+    @keyframes lo-product-float{0%,100%{transform:translateY(3px)}50%{transform:translateY(-3px)}}
+    @keyframes lo-product-sheen{0%{opacity:0;background-position:145% 0}18%{opacity:.72}70%{opacity:.62}100%{opacity:0;background-position:-45% 0}}
+    @keyframes lo-product-shake{0%,33%,66%{transform:translate(-6px,-9px) rotate(-1.9deg)}8%,41%,74%{transform:translate(-3px,-5px) rotate(-1.15deg)}16%,49%,82%{transform:translate(2px,2px) rotate(.55deg)}24%,57%,90%{transform:translate(6px,9px) rotate(2deg)}28%,61%,94%{transform:translate(1px,1px) rotate(.15deg)}31%,64%,97%{transform:translate(-4px,-6px) rotate(-1.25deg)}100%{transform:translate(0,0) rotate(0)}}
+    @media(hover:hover) and (pointer:fine){
+      .back:hover{transform:translateY(-2px);background:#111;color:#fff;border-color:#111}.back:active{transform:translateY(0) scale(.985)}
+      .hero:hover img{filter:brightness(1.045) saturate(1.02)}
+    }
+    @media(max-width:620px){
+      .page{width:min(100% - 28px,660px)}
+      .page-nav{top:23px}
+      .hero{width:100%}
+      .hero img{max-height:min(520px,calc(100svh - 145px))}
+      .checkout-section h1{font-size:23px}
+      .access-scene{height:100svh;min-height:100svh;max-height:100svh}
+      .page,.scene{height:100svh;min-height:100svh;max-height:100svh}
+      .deck{height:200svh}.deck.scene-2{transform:translate3d(0,-100svh,0)}
+      .access-scene input,.access-scene textarea,.access-scene select{font-size:16px!important}
+    }
   </style>
 </head>
 <body>
 <main class="page">
-  <button class="back" type="button" id="back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 12H6.5M11.5 6.5 6 12l5.5 5.5"/></svg><span>Back</span></button>
-
-  <button class="hero" id="hero" type="button" aria-label="Go to checkout">
-    <img src="/lensically-operator-box.png" alt="Lensically Operator for Threads product box">
-  </button>
-
-  <section class="section" id="checkout">
-    <h1>Lensically Operator for Threads</h1>
-    <p class="sub">AI Threads operator for planning, writing, scheduling, scoring, and improving your content.</p>
-    <div class="summary">
-      <p class="name">Commercial License</p>
-      <p class="price">$97</p>
-      <p class="price-note">One-time purchase</p>
-    </div>
-
-    <div class="panel">
-      <p class="panel-title">Payment Details</p>
-      <div class="checkout-shell">
-        <div class="embedded" id="embedded-checkout">
-          <div class="loading" id="loading">Loading secure payment form…</div>
-        </div>
+  <div class="deck" id="deck">
+    <section class="scene product-scene">
+      <div class="page-nav">
+        <button class="back" type="button" id="back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 12H6.5M11.5 6.5 6 12l5.5 5.5"/></svg><span>Back</span></button>
       </div>
-      <div class="error" id="error">The secure payment form could not load. Refresh and try again.</div>
-      <div class="policy"><strong>Digital product purchase</strong>After payment, Lensically verifies the order and routes you into its secure licensed delivery flow. Digital-product purchases are non-refundable except where required by law.</div>
-    </div>
-  </section>
+      <button class="hero" id="hero" type="button" aria-label="Go to checkout">
+        <img src="/lensically-operator-box.png" alt="Lensically Operator for Threads product box">
+      </button>
+    </section>
 
-  <div class="footer">© 2026 Lensically · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></div>
+    <section class="scene access-scene">
+      <div class="access-frame" id="access-frame">
+        <section class="checkout-section" id="checkout">
+          <h1>Lensically Operator for Threads</h1>
+          <p class="sub">AI Threads operator for planning, writing, scheduling, scoring, and improving your content.</p>
+          <div class="summary">
+            <p class="license">Commercial License</p>
+            <p class="price">$97</p>
+            <p class="price-note">One-time purchase</p>
+          </div>
+
+          <div class="paid-panel">
+            <p class="payment-title">Payment Details</p>
+            <div class="checkout-shell">
+              <div class="embedded" id="embedded-checkout">
+                <div class="loading" id="loading">Loading secure payment form…</div>
+              </div>
+            </div>
+            <div class="error" id="error">The secure payment form could not load. Refresh and try again.</div>
+            <div class="policy"><strong>Digital product purchase</strong>After payment, Lensically verifies the order and routes you into its secure licensed delivery flow. Digital-product purchases are non-refundable except where required by law.</div>
+          </div>
+        </section>
+        <div class="footer">© 2026 Lensically · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></div>
+      </div>
+    </section>
+  </div>
 </main>
 
 <script>
 (()=>{
   const API='https://lensically-v2-mcp.lensically.workers.dev/api/commercial/embedded-checkout-session';
+  const deck=document.getElementById('deck');
+  const frame=document.getElementById('access-frame');
   const back=document.getElementById('back');
   const hero=document.getElementById('hero');
   const loading=document.getElementById('loading');
   const error=document.getElementById('error');
-  let stripePromise=null,checkout=null,starting=false;
+  let stripePromise=null,checkout=null,starting=false,index=0,moving=false,touchY=0,touchX=0,claimed=false,heroBusy=false,fitTimer=0;
 
-  back.addEventListener('click',()=>{if(history.length>1)history.back();else location.href='/'});
-  hero.addEventListener('click',()=>document.getElementById('checkout').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}));
+  const go=next=>{
+    next=Math.max(0,Math.min(1,next));
+    if(next===index&&moving)return;
+    index=next;moving=true;deck.classList.toggle('scene-2',index===1);
+    setTimeout(()=>{moving=false},700);
+  };
+  const fitAccess=()=>{
+    if(!frame)return;
+    frame.style.setProperty('--lo-access-scale','1');
+    requestAnimationFrame(()=>{
+      const viewport=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
+      const natural=Math.max(frame.scrollHeight,frame.getBoundingClientRect().height);
+      const scale=Math.min(1,Math.max(.68,(viewport-44)/Math.max(1,natural)));
+      frame.style.setProperty('--lo-access-scale',String(scale));
+    });
+  };
+  const scheduleFit=(delay=0)=>{clearTimeout(fitTimer);fitTimer=setTimeout(fitAccess,delay)};
+  fitAccess();setTimeout(fitAccess,80);setTimeout(fitAccess,500);addEventListener('resize',()=>scheduleFit(40));if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>scheduleFit(40));
+
+  const fire=()=>{hero.classList.remove('glimmer-now');void hero.offsetWidth;hero.classList.add('glimmer-now');setTimeout(()=>hero.classList.remove('glimmer-now'),1950)};
+  setTimeout(fire,1800);setInterval(fire,8000);if(matchMedia('(hover:hover) and (pointer:fine)').matches)hero.addEventListener('mouseenter',fire);
+
+  back.addEventListener('click',()=>{if(index===1){go(0);return}if(history.length>1)history.back();else location.href='/'});
+  hero.addEventListener('click',()=>{
+    if(heroBusy)return;heroBusy=true;hero.classList.add('shaking');fire();
+    setTimeout(()=>{hero.classList.remove('shaking');heroBusy=false;go(1)},720);
+  });
+
+  addEventListener('wheel',event=>{
+    if(Math.abs(event.deltaY)<6)return;
+    event.preventDefault();if(moving)return;
+    if(event.deltaY>0&&index===0)go(1);else if(event.deltaY<0&&index===1)go(0);
+  },{passive:false});
+  document.addEventListener('keydown',event=>{
+    if(['PageDown','ArrowDown',' '].includes(event.key)&&index===0){event.preventDefault();go(1)}
+    else if(['PageUp','ArrowUp'].includes(event.key)&&index===1){event.preventDefault();go(0)}
+  });
+  document.addEventListener('touchstart',event=>{if(event.touches.length!==1)return;touchY=event.touches[0].clientY;touchX=event.touches[0].clientX;claimed=false},{passive:true});
+  document.addEventListener('touchmove',event=>{
+    if(!touchY||event.touches.length!==1)return;
+    const point=event.touches[0],dy=point.clientY-touchY,dx=point.clientX-touchX;
+    if(claimed){event.preventDefault();return}
+    if(Math.abs(dy)<8||Math.abs(dy)<=Math.abs(dx)*1.1)return;
+    claimed=true;event.preventDefault();
+  },{passive:false});
+  document.addEventListener('touchend',event=>{
+    if(!touchY||!event.changedTouches.length)return;
+    const end=event.changedTouches[0],dy=end.clientY-touchY,dx=end.clientX-touchX;
+    touchY=0;touchX=0;claimed=false;
+    if(Math.abs(dy)<48||Math.abs(dy)<=Math.abs(dx)*1.15||moving)return;
+    if(dy<0&&index===0)go(1);else if(dy>0&&index===1)go(0);
+  },{passive:true});
 
   const loadStripe=()=>{
     if(typeof window.Stripe==='function')return Promise.resolve();
@@ -97,10 +200,12 @@
       checkout=await stripe.initEmbeddedCheckout({fetchClientSecret:async()=>data.client_secret});
       if(loading)loading.remove();
       checkout.mount('#embedded-checkout');
+      scheduleFit(120);setTimeout(fitAccess,700);
     }catch(e){
       console.error(e);
       if(loading)loading.style.display='none';
       error.classList.add('show');
+      scheduleFit(40);
     }finally{starting=false}
   };
   start();
